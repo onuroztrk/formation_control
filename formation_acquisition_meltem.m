@@ -27,7 +27,7 @@ q0 = zeros(8,3);
 v0 = zeros(8,3);
 qout = zeros(1000,8,3);
 for i = 1:8
-    q0(i,:) = V(i,:)+(rand(1,3)-0.5*ones(1,3));
+    q0(i,:) = V(i,:)+ 0.5*(rand(1,3)-0.5*ones(1,3));
     v0(i,:) = 2*(rand(1,3)-0.5*ones(1,3));
 end
 q = q0;
@@ -90,13 +90,17 @@ for t = 1:1000
 
     u = zeros(8,3);
     Rqt = Rq';
-    for i = 1:8
-        sum = 0;
-        for j = 1:18
-             sum = sum + (ka*kv + 1)*Rqt(3*(i-1)+1:3*(i-1)+3,j)*z(j)+ (kv*(z(j) + 2*Rqt(3*(i-1)+1:3*(i-1)+3,j)*Rqt(3*(i-1)+1:3*(i-1)+3,j)')*vij(3*(i-1)+1:3*(i-1)+3,j));
-        end
-        u(i,:) = -ka*vi(i,:) - sum';
-    end
+    vf = -kv*rproduct(Rq',z);
+    dz = 2*rproduct2(Rq,vi)';
+    dvf = -kv*(rproduct(vij,z)+rproduct(Rq',dz));
+    u = -ka*(vi-vf)+dvf-rproduct(Rq',z);
+%     for i = 1:8
+%         sum = 0;
+%         for j = 1:18
+%              sum = sum + (ka*kv + 1)*Rqt(3*(i-1)+1:3*(i-1)+3,j)*z(j)+ (kv*(z(j) + 2*Rqt(3*(i-1)+1:3*(i-1)+3,j)*Rqt(3*(i-1)+1:3*(i-1)+3,j)')*vij(3*(i-1)+1:3*(i-1)+3,j));
+%         end
+%         u(i,:) = -ka*vi(i,:) - sum';
+%     end
 
     vi = vi+u*T;
     q = q+vi*T;
@@ -113,4 +117,25 @@ end
 plot3(qout(end,:,1),qout(end,:,2),qout(end,:,3),'o');
 hold off
 
+function m = rproduct(R,z)
+    m = zeros(8,3);
+    for i = 1:8
+        sum = 0;
+        for j = 1:18
+            sum = sum + R(3*(i-1)+1:3*(i-1)+3,j)*z(j);
+        end
+    m(i,:) = sum;
+    end
+end
+
+function m = rproduct2(R,z)
+    m = zeros(18,1);
+    for i = 1:18
+        sum = 0;
+        for j = 1:8
+            sum = sum + R(i,3*(j-1)+1:3*(j-1)+3)*z(j,:)';
+        end
+    m(i,:) = sum;
+    end
+end
 
