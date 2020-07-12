@@ -25,7 +25,9 @@ T = 0.01;
 
 q0 = zeros(8,3);
 v0 = zeros(8,3);
+qij_out = zeros(1000,1,18);
 qout = zeros(1000,8,3);
+e_out = zeros(1000,18);
 for i = 1:8
     q0(i,:) = V(i,:)+ 0.5*(rand(1,3)-0.5*ones(1,3));
     v0(i,:) = 2*(rand(1,3)-0.5*ones(1,3));
@@ -82,10 +84,12 @@ for t = 1:1000
            norm((q(3,:)-q(6,:))) norm((q(3,:)-q(7,:))) norm((q(4,:)-q(7,:))) ...
            norm((q(4,:)-q(8,:))) norm((q(5,:)-q(6,:))) norm((q(5,:)-q(8,:))) ...
            norm((q(6,:)-q(7,:))) norm((q(6,:)-q(8,:))) norm((q(7,:)-q(8,:)))];
-       
+    
+    qij_out(t,:,:) = qij; 
 
     e = qij - dij;
-
+    e_out(t,:) = e;
+    
     z = e.*(e+2*dij);
 
     u = zeros(8,3);
@@ -114,8 +118,17 @@ grid on
 for t = 2:1000
     plot3(qout(t,:,1),qout(t,:,2),qout(t,:,3),'.');
 end
-plot3(qout(end,:,1),qout(end,:,2),qout(end,:,3),'o');
+
+g1 = graph([1 1 1 1 1 2 2 2 3 3 3 4 4 5 5 6 6 7],[2 3 4 5 8 3 5 6 4 6 7 7 8 6 8 7 8 8],squeeze(qij_out(end,:,:)));
+plot(g1,'XData',qout(end,:,1)','YData',qout(end,:,2)','ZData',qout(end,:,3)');
+
 hold off
+
+figure(2)
+plot(0:0.01:4.99,e_out(1:500,:))
+ylabel('e_{ij}')
+xlabel('s')
+grid on
 
 function m = rproduct(R,z)
     m = zeros(8,3);

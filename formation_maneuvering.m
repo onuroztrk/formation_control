@@ -15,6 +15,7 @@ T = 0.01;
 
 q0 = zeros(6,2);
 qout = zeros(1000,6,2);
+e_out = zeros(1000,9);
 for i = 1:5
     q0(i,:) = [V(i,:)+delta*(rand(1,2)-0.5*ones(1,2))];
 end
@@ -37,6 +38,7 @@ for t = 1:1000
     
     qin = [(q(1,:)-q(6,:));(q(2,:)-q(6,:));(q(3,:)-q(6,:));(q(4,:)-q(6,:));(q(5,:)-q(6,:));0 0];
     e = qij - dij;
+    e_out(t,:) = e;
 
     z = e.*(e+2*dij);
     v0 = [1 cos(t*T)];
@@ -69,3 +71,9 @@ plot(qout(800,:,1),qout(800,:,2),'o');
 plot(qout(end,:,1),qout(end,:,2),'o');
 plot(q0(:,1),q0(:,2),'*');
 hold off
+
+figure(2)
+plot(0:0.01:0.99,e_out(1:100,:))
+ylabel('e_{ij}')
+xlabel('s')
+grid on

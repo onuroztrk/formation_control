@@ -18,6 +18,7 @@ v0 = [1 2];
 
 q0 = zeros(5,2);
 qout = zeros(1000,5,2);
+e_out = zeros(1000,7);
 for i = 1:5
     q0(i,:) = [V(i,:)+delta*(rand(1,2)-0.5*ones(1,2))];
 end
@@ -37,7 +38,8 @@ for t = 1:1000
         norm((q(1,:)-q(5,:))) norm((q(2,:)-q(3,:))) norm((q(3,:)-q(4,:))) norm((q(4,:)-q(5,:)))];
 
     e = qij - dij;
-
+    e_out(t,:) = e;
+    
     z = e.*(e+2*dij);
    
     v_hat_n(1,:) = v_hat(1,:) - alpha*(v_hat(1,:)-v_hat(2,:) + v_hat(1,:)-v_hat(3,:) + v_hat(1,:)-v_hat(4,:) + v_hat(1,:)-v_hat(5,:))*T;
@@ -75,3 +77,10 @@ plot(qout(800,:,1),qout(800,:,2),'o');
 plot(qout(end,:,1),qout(end,:,2),'o');
 plot(q0(:,1),q0(:,2),'*');
 hold off
+
+figure(2)
+plot(0:0.01:4.99,e_out(1:500,:))
+ylabel('e_{ij}')
+xlabel('s')
+grid on
+
