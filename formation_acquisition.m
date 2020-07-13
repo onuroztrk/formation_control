@@ -15,6 +15,7 @@ T = 0.01;
 q0 = zeros(5,2);
 qout = zeros(1000,5,2);
 e_out = zeros(1000,7);
+qij_out = zeros(1000,7);
 for i = 1:5
     q0(i,:) = [V(i,:)+delta*(rand(1,2)-0.5*ones(1,2))];
 end
@@ -37,6 +38,7 @@ for t = 1:1000
     qij = [norm((q(1,:)-q(2,:))) norm((q(1,:)-q(3,:))) norm((q(1,:)-q(4,:))) ...
         norm((q(1,:)-q(5,:))) norm((q(2,:)-q(3,:))) norm((q(3,:)-q(4,:))) norm((q(4,:)-q(5,:)))];
 
+    qij_out(t,:) = qij;
     e = qij - dij;
     e_out(t,:) = e;
     z = e.*(e+2*dij);
@@ -55,9 +57,11 @@ for t = 1:1000
     qout(t,:,:) = q;
 end
 
-figure(1)
-plot(qout(1,:,1),qout(1,:,2),'.');
+g1 = graph([1 1 1 1 2 3 4],[2 3 4 5 3 4 5],qij_out(end,:));
+plot(g1,'XData',qout(end,:,1)','YData',qout(end,:,2)');
+
 hold on
+plot(qout(1,:,1),qout(1,:,2),'.');
 grid on
 for t = 2:1000
     plot(qout(t,:,1),qout(t,:,2),'.');
